@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 num_rows = 1050
 cities = ['Warsaw', 'Krakow', 'Wroclaw', 'Gdansk', 'Prague', 'Berlin', 'Paris']
 
-
 filters_data = {
     'rules': ['Free cancellation', 'Early check-in', 'Late check-out'],
     'meals': ['All inclusive', 'All meals', 'Breakfast', 'Dinner', 'Lunch'],
@@ -53,7 +52,6 @@ filters_data = {
     'other': ['Boutique hotel', 'Design hotel', 'Dutch-speaking staff', 'English-speaking staff', 'Historical building', 'Multilingual staff']
 }
 
-
 ai_scenarios = [
     {"prompt": "quiet hotel with parking and breakfast near center", "city": "Krakow", "parking": "parking", "meals": "Breakfast", "facilities": "Soundproof room"},
     {"prompt": "pet-friendly room with big bed and wifi for work", "city": "Warsaw", "pets": "All pets allowed", "meals": "", "facilities": "Wi-fi,Work desk,King/Queen-size 150+cm width"},
@@ -63,7 +61,7 @@ ai_scenarios = [
 ]
 
 headers = [
-    'id', 'user_id', 'status', 'created_at', 'closed_at', 'city_of_booking', 'start_date', 'end_date', 
+    'id', 'user_id', 'created_at', 'closed_at', 'city_of_booking', 'start_date', 'end_date', 
     'cnt_of_person', 'min_price', 'max_price', 'booking_id', 'rules', 'meals', 'pets', 'parking', 
     'accessibility', 'facilities', 'search_settings', 'room_size', 'kids', 'pool_n_beach', 'sport', 
     'transfer', 'business', 'rating', 'score', 'other', 'search_mode', 'ai_chat_id'
@@ -77,7 +75,6 @@ def get_random_filters(filter_list, max_items=3):
     num_elements = random.randint(1, min(max_items, len(filter_list)))
     return ", ".join(random.sample(filter_list, num_elements))
 
-
 with open('booking_activity_dataset.csv', mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(headers)
@@ -88,14 +85,19 @@ with open('booking_activity_dataset.csv', mode='w', newline='', encoding='utf-8'
         
         search_mode = 'ai' if random.random() < 0.6 else 'manual'
         
-        session_duration = random.randint(1, 5) if search_mode == 'ai' else random.randint(5, 25)
-        created_at = base_date + timedelta(days=random.randint(0, 140), hours=random.randint(0, 23), minutes=random.randint(0, 59))
-        closed_at = created_at + timedelta(minutes=session_duration)
-        
         if search_mode == 'ai':
             status = random.choice(['closed', 'booked', 'booked', 'in_progress'])
         else:
             status = random.choice(['closed', 'closed', 'in_progress', 'booked'])
+        
+        session_duration = random.randint(1, 5) if search_mode == 'ai' else random.randint(5, 25)
+        created_at = base_date + timedelta(days=random.randint(0, 140), hours=random.randint(0, 23), minutes=random.randint(0, 59))
+        
+        if status == 'in_progress':
+            closed_at_str = ""
+        else:
+            closed_at = created_at + timedelta(minutes=session_duration)
+            closed_at_str = closed_at.strftime('%Y-%m-%d %H:%M:%S')
             
         booking_id = random.randint(75000, 100000) if status == 'booked' else ""
 
@@ -141,7 +143,7 @@ with open('booking_activity_dataset.csv', mode='w', newline='', encoding='utf-8'
                     filters[key] = get_random_filters(filters_data[key], max_items=1) if random.random() < 0.15 else ""
 
         writer.writerow([
-            row_id, user_id, status, created_at.strftime('%Y-%m-%d %H:%M:%S'), closed_at.strftime('%Y-%m-%d %H:%M:%S'),
+            row_id, user_id, created_at.strftime('%Y-%m-%d %H:%M:%S'), closed_at_str,
             city_of_booking, start_date, end_date, cnt_persons, min_price, max_price, booking_id,
             filters.get('rules', ''), filters.get('meals', ''), filters.get('pets', ''), filters.get('parking', ''),
             filters.get('accessibility', ''), filters.get('facilities', ''), filters.get('search_settings', ''), filters['room_size'],
