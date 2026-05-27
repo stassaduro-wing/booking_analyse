@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 num_rows = 1050
 cities = ['Warsaw', 'Krakow', 'Wroclaw', 'Gdansk', 'Prague', 'Berlin', 'Paris']
 
-# Списки фильтров на основе твоих данных
+
 filters_data = {
     'rules': ['Free cancellation', 'Early check-in', 'Late check-out'],
     'meals': ['All inclusive', 'All meals', 'Breakfast', 'Dinner', 'Lunch'],
@@ -53,12 +53,12 @@ filters_data = {
     'other': ['Boutique hotel', 'Design hotel', 'Dutch-speaking staff', 'English-speaking staff', 'Historical building', 'Multilingual staff']
 }
 
-# Исправил типы данных для ИИ сценариев
+
 ai_scenarios = [
     {"prompt": "quiet hotel with parking and breakfast near center", "city": "Krakow", "parking": "parking", "meals": "Breakfast", "facilities": "Soundproof room"},
     {"prompt": "pet-friendly room with big bed and wifi for work", "city": "Warsaw", "pets": "All pets allowed", "meals": "", "facilities": "Wi-fi,Work desk,King/Queen-size 150+cm width"},
     {"prompt": "cheap hostel for weekend trip with friends", "city": "Wroclaw", "cnt_persons": (3, 5), "max_price": 150, "facilities": "Kitchen"},
-    {"prompt": "luxury apartment with pool and gym", "city": "Warsaw", "min_price": 500, "max_price": 2000, "pool_n_beach": "Any pool", "sport": "Gym,Spa", "rating": "4.5", "score": "4.8"},
+    {"prompt": "luxury apartment with pool and gym", "city": "Warsaw", "min_price": 500, "max_price": 2000, "pool_n_beach": "Any pool", "sport": "Gym,Spa", "rating": 5, "score": 9},
     {"prompt": "family room close to beach with kids area", "city": "Gdansk", "kids": "Family-friendly,Playground or Playroom", "facilities": "Beachfront"}
 ]
 
@@ -77,7 +77,7 @@ def get_random_filters(filter_list, max_items=3):
     num_elements = random.randint(1, min(max_items, len(filter_list)))
     return ", ".join(random.sample(filter_list, num_elements))
 
-# Генерируем датасет
+
 with open('booking_activity_dataset.csv', mode='w', newline='', encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(headers)
@@ -112,9 +112,9 @@ with open('booking_activity_dataset.csv', mode='w', newline='', encoding='utf-8'
         ai_chat_id = random.randint(5000, 9000) if search_mode == 'ai' else ""
         
         filters = {}
-        filters['room_size'] = str(random.randint(10, 100)) if random.random() > 0.3 else "0"
-        filters['rating'] = str(round(random.uniform(2.0, 5.0), 1)) if random.random() > 0.3 else "1.0"
-        filters['score'] = str(round(random.uniform(4.0, 5.0), 1)) if random.random() > 0.3 else "1.0"
+        filters['room_size'] = random.randint(10, 100) if random.random() > 0.3 else 0
+        filters['rating'] = random.randint(1, 5) if random.random() > 0.3 else 1
+        filters['score'] = random.randint(1, 10) if random.random() > 0.3 else 1
 
         if search_mode == 'manual':
             for key in filters_data:
