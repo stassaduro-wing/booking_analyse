@@ -38,3 +38,22 @@ SELECT
 		COUNT(*) FILTER (WHERE orders_count > 1)*100/COUNT(*),
 	2) AS percent_loyal_users
 FROM user_orders
+
+--3.1
+
+SELECT city_of_booking,
+COUNT(*)
+FROM events
+GROUP BY city_of_booking
+
+--3.2
+
+SELECT
+	(end_date-start_date) AS count_days,
+	COUNT(*) AS raito
+FROM events
+GROUP BY count_days
+ORDER BY raito DESC
+
+--3.3
+
