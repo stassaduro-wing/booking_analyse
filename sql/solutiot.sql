@@ -23,3 +23,18 @@ EXTRACT(EPOCH FROM AVG(closed_at-created_at) FILTER (WHERE search_mode = 'ai' AN
 , 2) AS avg_ai_vs_avg_man
 
 FROM events
+
+--2 
+
+WITH user_orders AS (
+	SELECT 
+		user_id,
+		COUNT(*) FILTER (WHERE booking_id IS NOT NULL) AS orders_count
+	FROM events
+	GROUP BY user_id
+)
+SELECT
+	ROUND(
+		COUNT(*) FILTER (WHERE orders_count > 1)*100/COUNT(*),
+	2) AS percent_loyal_users
+FROM user_orders
