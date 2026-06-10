@@ -57,3 +57,42 @@ ORDER BY raito DESC
 
 --3.3
 
+WITH total_events AS (
+    SELECT COUNT(*)::float AS total_count FROM events
+),
+unnested_filters AS (
+    SELECT unnest(string_to_array(meals, ', ')) AS filter_name, 'meals' AS category FROM events WHERE meals IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(pets, ', ')) AS filter_name, 'pets' AS category FROM events WHERE pets IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(parking, ', ')) AS filter_name, 'parking' AS category FROM events WHERE parking IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(accessibility, ', ')) AS filter_name, 'accessibility' AS category FROM events WHERE accessibility IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(facilities, ', ')) AS filter_name, 'facilities' AS category FROM events WHERE facilities IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(kids, ', ')) AS filter_name, 'kids' AS category FROM events WHERE kids IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(pool_n_beach, ', ')) AS filter_name, 'pool_n_beach' AS category FROM events WHERE pool_n_beach IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(sport, ', ')) AS filter_name, 'sport' AS category FROM events WHERE sport IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(transfer, ', ')) AS filter_name, 'transfer' AS category FROM events WHERE transfer IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(business, ', ')) AS filter_name, 'business' AS category FROM events WHERE business IS NOT NULL
+    UNION ALL
+    SELECT unnest(string_to_array(other, ', ')) AS filter_name, 'other' AS category FROM events WHERE other IS NOT NULL
+)
+SELECT 
+    f.filter_name,
+    f.category,
+    ROUND(
+        (COUNT(*) * 100.0 / t.total_count)::numeric, 
+        2
+    ) AS percent_of_total_searches
+FROM unnested_filters f
+CROSS JOIN total_events t 
+WHERE f.filter_name IS NOT NULL
+GROUP BY f.filter_name, f.category, t.total_count
+ORDER BY percent_of_total_searches DESC
+LIMIT 10;
