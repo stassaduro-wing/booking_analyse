@@ -12,13 +12,13 @@ ROUND(
 (COUNT(*) FILTER (WHERE search_mode != 'ai' AND booking_id != 0)*100.0/COUNT(*)) 
 ,2) AS success_ai_vs_man,
 
-AVG(closed_at-created_at) FILTER (WHERE search_mode = 'ai' AND booking_id != 0) AS avg_duration_man,
-AVG(closed_at-created_at) FILTER (WHERE search_mode != 'ai' AND booking_id != 0) AS avg_duration_ai,
+AVG(closed_at-created_at) FILTER (WHERE search_mode = 'ai' AND booking_id IS NOT NULL) AS avg_duration_ai,
+AVG(closed_at-created_at) FILTER (WHERE search_mode != 'ai' AND booking_id IS NOT NULL) AS avg_duration_man,
 ROUND(
 
-EXTRACT(EPOCH FROM (AVG(closed_at-created_at) FILTER (WHERE search_mode != 'ai' AND booking_id != 0)))
+EXTRACT(EPOCH FROM (AVG(closed_at-created_at) FILTER (WHERE search_mode != 'ai' AND booking_id IS NOT NULL)))
 /
-EXTRACT(EPOCH FROM AVG(closed_at-created_at) FILTER (WHERE search_mode = 'ai' AND booking_id != 0))
+EXTRACT(EPOCH FROM AVG(closed_at-created_at) FILTER (WHERE search_mode = 'ai' AND booking_id IS NOT NULL))
 
 , 2) AS avg_ai_vs_avg_man
 
@@ -35,7 +35,7 @@ WITH user_orders AS (
 )
 SELECT
 	ROUND(
-		COUNT(*) FILTER (WHERE orders_count > 1)*100/COUNT(*),
+		COUNT(*) FILTER (WHERE orders_count > 1)*100.0/COUNT(*),
 	2) AS percent_loyal_users
 FROM user_orders
 
